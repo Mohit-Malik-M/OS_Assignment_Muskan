@@ -1,0 +1,84 @@
+Code:-
+ #include <stdio.h>
+#include <stdlib.h>
+#define LAST 100
+typedef struct
+{
+    int prid, bst, wt,tat ;
+} Process;
+void print_table( Process pr[], int m);
+void print_gantt_chart(Process pr[], int m);
+int main()
+{
+    Process pr[LAST];
+    int p, q, m;
+    int s_w = 0, s_t;
+    printf("Enter total number of process: ");
+    scanf("%d", &m);
+    printf("Enter burst time for each process:\n");
+    for(p=0; p<m; p++) {
+        pr[p].prid = p+1;
+        printf("P[%d] : ", p+1);
+        scanf("%d", &pr[p].bst);
+        pr[p].wt = pr[p].tat = 0;
+    }    
+    pr[0].tat = pr[0].bst;
+   for(p=1; p<m; p++) {
+        pr[p].wt = pr[p-1].wt + pr[p-1].bst;
+        pr[p].tat = pr[p].wt + pr[p].bst;
+    }   
+    for(p=0; p<m; p++) {
+            s_w += pr[p].wt;
+            s_t += pr[p].tat;
+    }   
+    puts(""); 
+    print_table(pr, m);
+    puts(""); 
+    printf("Waiting Time is     : %-2d\n", s_w);
+    printf("Average Waiting Time is  : %-2.2lf\n", (double)s_w / (double) m);
+    printf("Total Turnaround Time is  : %-2d\n", s_t);
+    printf("Average Turnaround Time : %-2.2lf\n", (double)s_t / (double) m);
+ 
+    puts(""); 
+    puts("          GANTT CHART          ");
+    puts("          *****          ");
+    print_gantt_chart(pr,m);
+    return 0;
+}void print_table(Process pr[], int m)
+{   int p; 
+  puts("+-----+------------+--------------+-----------------+");
+    puts("| PID | Burst Time | Waiting Time | Turnaround Time |");
+    puts("+-----+------------+--------------+-----------------+");
+  for(p=0; p<m; p++) {
+        printf("| %2d  |     %2d     |      %2d      |        %2d       |\n"
+               , pr[p].prid, pr[p].bst, pr[p].wt, pr[p].tat );
+        puts("+-----+------------+--------------+-----------------+");
+    }}
+void print_gantt_chart(Process pr[], int m)
+{  int p, q;
+    printf(" ");
+    for(p=0; p<m; p++) {
+        for(q=0; q<pr[p].bst; q++) printf("--");
+        printf(" ");
+    }
+    printf("\n|");
+      for(p=0; p<m; p++) {
+        for(q=0; q<pr[p].bst - 1; q++) printf(" ");
+        printf("P%d", pr[p].prid);
+        for(q=0; q<pr[p].bst - 1; q++) printf(" ");
+        printf("|");
+    }
+    printf("\n ");
+    
+    for(p=0; p<m; p++) {
+        for(q=0; q<pr[p].bst; q++) printf("--");
+        printf(" ");
+    }
+    printf("\n");   
+    printf("0");
+    for(p=0; p<m; p++) {
+        for(q=0; q<pr[p].bst; q++) printf("  ");
+        if(pr[p].tat > 9) printf("\n"); 
+        printf("%d", pr[p].tat);
+   }    printf("\n");
+}
